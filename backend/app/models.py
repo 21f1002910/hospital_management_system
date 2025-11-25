@@ -11,13 +11,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class UserRole(Enum):
-    """Enumeration for user roles in the system."""
+    #Enumeration for user roles in the system.
     ADMIN = 'Admin'
     DOCTOR = 'Doctor'
     PATIENT = 'Patient'
 
 class User(db.Model):
-    """Base User model for all roles (Admin, Doctor, Patient)."""
+    #Base User model for all roles (Admin, Doctor, Patient).
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +43,7 @@ class User(db.Model):
         return f'<User {self.username} - {self.role.value}>'
 
 class Department(db.Model):
-    """Model for medical departments/specializations."""
+    #Model for medical departments/specializations.
     __tablename__ = 'departments'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -59,7 +59,7 @@ class Department(db.Model):
         return f'<Department {self.name}>'
 
 class Doctor(db.Model):
-    """Model for Doctor profiles, linked to User."""
+    #Model for Doctor profiles, linked to User.
     __tablename__ = 'doctors'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -78,7 +78,7 @@ class Doctor(db.Model):
         return f'<Doctor {self.name}>'
 
 class DoctorAvailability(db.Model):
-    """Model for Doctor's availability slots (for the next 7 days)."""
+    #Model for Doctor's availability slots (for the next 7 days).
     __tablename__ = 'doctor_availabilities'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -100,7 +100,7 @@ class DoctorAvailability(db.Model):
         return f'<DoctorAvailability for Doctor {self.doctor_id} on {self.date}>'
 
 class Patient(db.Model):
-    """Model for Patient profiles, linked to User."""
+    #Model for Patient profiles, linked to User.
     __tablename__ = 'patients'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -120,13 +120,13 @@ class Patient(db.Model):
         return f'<Patient {self.name}>'
 
 class AppointmentStatus(Enum):
-    """Enumeration for appointment statuses."""
+    #Enumeration for appointment statuses.
     BOOKED = 'Booked'
     COMPLETED = 'Completed'
     CANCELLED = 'Cancelled'
 
 class Appointment(db.Model):
-    """Model for Appointments between Doctors and Patients."""
+    #Model for Appointments between Doctors and Patients.
     __tablename__ = 'appointments'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -146,7 +146,7 @@ class Appointment(db.Model):
         return f'<Appointment {self.id} - {self.status.value}>'
 
 class Treatment(db.Model):
-    """Model for Treatments recorded during Appointments."""
+    #Model for Treatments recorded during Appointments.
     __tablename__ = 'treatments'
 
     id = db.Column(db.Integer, primary_key=True)
