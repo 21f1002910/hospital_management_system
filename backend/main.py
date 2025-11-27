@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 
-load_dotenv()  # Load .env variables into os.environ
+load_dotenv()
 
 from app import create_app
 

@@ -12,7 +12,7 @@ const messageStore = useMessageStore()
 </script>
 
 <template>
-    <div>Welcome Admin!</div>
+    <div>Welcome {{authStore.email}}!</div>
 </template>
 
 <style scoped>

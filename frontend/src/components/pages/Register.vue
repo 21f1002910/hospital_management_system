@@ -1,75 +1,50 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
-import { useStorage } from '@vueuse/core' 
-import { useMessageStore } from '../../store/index.js'
+import { useAuthStore } from '../../store/auth.js'
+import { useMessageStore } from '../../store'
 
 const router = useRouter()
+const authStore = useAuthStore()
+const messageStore = useMessageStore()
 
-const username = ref('')
-const password = ref('')
-const confirm_password = ref('')
-const name = ref('')
-const age = ref('')
-const gender = ref('')
-const contact = ref('')
-const address = ref('')
+const form = ref({
+  name: '',
+  email: '',
+  contact: '',
+  password: '',
+  confirm_password: '',
+})
 
-const loggedIn = ref(false)
-const token = useStorage('token', '')
-const role = useStorage('role', '')
+const loading = ref(false)
 
 async function handleRegister() {
-  messageStore.clear()
-  if (password.value !== confirm_password.value) {
-    messageStore.showError('Passwords do not match')
+  // Validation
+  if (form.value.password !== form.value.confirm_password) {
+    messageStore.error('Passwords do not match')
     return
   }
 
+  if (form.value.password.length < 6) {
+    messageStore.error('Password must be at least 6 characters')
+    return
+  }
+
+  loading.value = true
+
   try {
-    const registerData = {
-      username: username.value,
-      password: password.value,
-      name: name.value,
-      age: parseInt(age.value),
-      gender: gender.value,
-      contact: contact.value,
-      address: address.value
-    }
+    const result = await authStore.register(form.value)
 
-    const response = await axios.post('/api/register', registerData, {
-      validateStatus: status => status < 500
-    })
-
-    if (response.status === 201 || response.status === 200) {
-        const loginData = {
-        username: username.value,
-        password: password.value}
-        const loginResponse = await axios.post('/api/login', loginData, {
-        validateStatus: status => status < 500
-      })
-      if (loginResponse.status === 200) {
-        token.value = loginResponse.data.access_token
-        role.value = loginResponse.data.role
-        
-        messageStore.showSuccess('Registered successfully! Redirecting to patient dashboard...')
-
-        setTimeout(() => {
-          router.push({ name: 'PatientHome' })
-        }, 2000)
-      } else {
-        messageStore.showError('Registration succeeded but login failed. Please login manually.')
-        setTimeout(() => {
-          router.push({ name: 'Login' })
-        }, 2000)
-      }
+    if (result.success) {
+      messageStore.success(result.message)
+      router.push('/login')
     } else {
-      messageStore.showError(response.data?.message || 'Registration failed!')
+      messageStore.error(result.message || 'Registration failed')
     }
   } catch (error) {
-    messageStore.showError(error.message || 'Network error. Please check backend.')
-    console.error('Registration error:', error)
+    messageStore.error('An error occurred. Please try again.')
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -85,63 +60,37 @@ async function handleRegister() {
 
       <form @submit.prevent="handleRegister">
         <div class="form-group row mb-2">
-          <label class="col-sm-4 col-form-label text-start">Username</label>
-          <div class="col-sm-8">
-            <input v-model="username" type="text" class="form-control" required>
-          </div>
-        </div>
-
-        <div class="form-group row mb-2">
           <label class="col-sm-4 col-form-label text-start">Full Name</label>
           <div class="col-sm-8">
-            <input v-model="name" type="text" class="form-control" required>
+            <input v-model="form.name" type="text" class="form-control" required>
           </div>
         </div>
 
         <div class="form-group row mb-2">
-          <label class="col-sm-4 col-form-label text-start">Age</label>
+          <label class="col-sm-4 col-form-label text-start">Email</label>
           <div class="col-sm-8">
-            <input v-model="age" type="number" class="form-control" min="1" max="150" required>
-          </div>
-        </div>
-
-        <div class="form-group row mb-2">
-          <label class="col-sm-4 col-form-label text-start">Gender</label>
-          <div class="col-sm-8">
-            <select v-model="gender" class="form-control" required>
-              <option value="">Select</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Prefer not to Say</option>
-            </select>
+            <input v-model="form.email" type="text" class="form-control" required>
           </div>
         </div>
 
         <div class="form-group row mb-2">
           <label class="col-sm-4 col-form-label text-start">Contact Number</label>
           <div class="col-sm-8">
-            <input v-model="contact" type="tel" class="form-control">
-          </div>
-        </div>
-
-        <div class="form-group row mb-2">
-          <label class="col-sm-4 col-form-label text-start">Address</label>
-          <div class="col-sm-8">
-            <textarea v-model="address" rows="2" class="form-control"></textarea>
+            <input v-model="form.contact" type="tel" class="form-control" required>
           </div>
         </div>
 
         <div class="form-group row mb-2">
           <label class="col-sm-4 col-form-label text-start">Password</label>
           <div class="col-sm-8">
-            <input v-model="password" type="password" class="form-control" required>
+            <input v-model="form.password" type="password" class="form-control" required>
           </div>
         </div>
 
         <div class="form-group row mb-3">
           <label class="col-sm-4 col-form-label text-start">Confirm Password</label>
           <div class="col-sm-8">
-            <input v-model="confirm_password" type="password" class="form-control" required>
+            <input v-model="form.confirm_password" type="password" class="form-control" required>
           </div>
         </div>
 
@@ -149,12 +98,6 @@ async function handleRegister() {
         <button type="button" class="btn btn-outline-secondary w-50 d-block mx-auto" @click="router.push({ name: 'Login' })">
           Back to Login
         </button>
-
-        <div v-if="message" class="alert mt-3 text-center"
-            :class="success ? 'alert-success' : 'alert-danger'">
-            {{ message }}
-        </div>
-
       </form>
     </div>
   </div>

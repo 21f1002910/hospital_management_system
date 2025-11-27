@@ -11,19 +11,21 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class UserRole(Enum):
-    #Enumeration for user roles in the system.
+    """Enumeration for user roles in the system."""
     ADMIN = 'Admin'
     DOCTOR = 'Doctor'
     PATIENT = 'Patient'
 
+
 class User(db.Model):
-    #Base User model for all roles (Admin, Doctor, Patient).
+    """Base User model for all roles (Admin, Doctor, Patient)."""
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)  # ✅ PRIMARY LOGIN
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.Enum(UserRole), nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -40,10 +42,11 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self) -> str:
-        return f'<User {self.username} - {self.role.value}>'
+        return f'<User {self.email} - {self.role.value}>'
+
 
 class Department(db.Model):
-    #Model for medical departments/specializations.
+    """Model for medical departments/specializations."""
     __tablename__ = 'departments'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -58,8 +61,9 @@ class Department(db.Model):
     def __repr__(self) -> str:
         return f'<Department {self.name}>'
 
+
 class Doctor(db.Model):
-    #Model for Doctor profiles, linked to User.
+    """Model for Doctor profiles, linked to User."""
     __tablename__ = 'doctors'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -67,6 +71,8 @@ class Doctor(db.Model):
     name = db.Column(db.String(100), nullable=False)
     specialization_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
     bio = db.Column(db.Text, nullable=True)
+    contact = db.Column(db.String(50), nullable=True)
+    schedule = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -77,14 +83,15 @@ class Doctor(db.Model):
     def __repr__(self) -> str:
         return f'<Doctor {self.name}>'
 
+
 class DoctorAvailability(db.Model):
-    #Model for Doctor's availability slots (for the next 7 days).
+    """Model for Doctor's availability slots."""
     __tablename__ = 'doctor_availabilities'
 
     id = db.Column(db.Integer, primary_key=True)
     doctor_id = db.Column(db.Integer, db.ForeignKey('doctors.id'), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    time_slots = db.Column(db.Text, nullable=False)  # JSON string of available time slots, e.g., '["09:00", "10:00"]'
+    time_slots = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -99,8 +106,9 @@ class DoctorAvailability(db.Model):
     def __repr__(self) -> str:
         return f'<DoctorAvailability for Doctor {self.doctor_id} on {self.date}>'
 
+
 class Patient(db.Model):
-    #Model for Patient profiles, linked to User.
+    """Model for Patient profiles, linked to User."""
     __tablename__ = 'patients'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -108,8 +116,10 @@ class Patient(db.Model):
     name = db.Column(db.String(100), nullable=False)
     age = db.Column(db.Integer, nullable=True)
     gender = db.Column(db.String(10), nullable=True)
-    contact = db.Column(db.String(50), nullable=True)
+    contact = db.Column(db.String(50), nullable=False)  # ✅ Made required
     address = db.Column(db.Text, nullable=True)
+    blood_group = db.Column(db.String(5), nullable=True)
+    allergies = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -119,14 +129,17 @@ class Patient(db.Model):
     def __repr__(self) -> str:
         return f'<Patient {self.name}>'
 
+
 class AppointmentStatus(Enum):
-    #Enumeration for appointment statuses.
+    """Enumeration for appointment statuses."""
     BOOKED = 'Booked'
     COMPLETED = 'Completed'
     CANCELLED = 'Cancelled'
+    NO_SHOW = 'No Show'
+
 
 class Appointment(db.Model):
-    #Model for Appointments between Doctors and Patients.
+    """Model for Appointments between Doctors and Patients."""
     __tablename__ = 'appointments'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -136,17 +149,24 @@ class Appointment(db.Model):
     time = db.Column(db.Time, nullable=False)
     status = db.Column(db.Enum(AppointmentStatus), default=AppointmentStatus.BOOKED, nullable=False)
     notes = db.Column(db.Text, nullable=True)
+    reason = db.Column(db.String(200), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship: One appointment has one treatment
+    # Relationship
     treatment = db.relationship('Treatment', backref='appointment', uselist=False, cascade='all, delete-orphan')
+
+    # Index to prevent double booking
+    __table_args__ = (
+        db.Index('idx_doctor_date_time', 'doctor_id', 'date', 'time'),
+    )
 
     def __repr__(self) -> str:
         return f'<Appointment {self.id} - {self.status.value}>'
 
+
 class Treatment(db.Model):
-    #Model for Treatments recorded during Appointments.
+    """Model for Treatments recorded during Appointments."""
     __tablename__ = 'treatments'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -161,19 +181,37 @@ class Treatment(db.Model):
     def __repr__(self) -> str:
         return f'<Treatment for Appointment {self.appointment_id}>'
 
-# Helper functions for use in other parts of the app
 
-def create_admin_user(username: str, password: str) -> None:
-    #Programmatically create the Admin user if it doesn't exist.
+# Helper functions
+
+def create_admin_user(email: str, password: str) -> None:
+    """Create the Admin user if it doesn't exist."""
     existing_admin = User.query.filter_by(role=UserRole.ADMIN).first()
     if not existing_admin:
-        admin = User(username=username, role=UserRole.ADMIN)
+        admin = User(email=email, role=UserRole.ADMIN)
         admin.set_password(password)
         db.session.add(admin)
         db.session.commit()
 
+
+def seed_departments() -> None:
+    """Seed initial departments if none exist."""
+    if Department.query.count() == 0:
+        departments = [
+            Department(name='Cardiology', description='Heart and cardiovascular system'),
+            Department(name='Neurology', description='Brain and nervous system'),
+            Department(name='Orthopedics', description='Bones, joints, and muscles'),
+            Department(name='Pediatrics', description='Children healthcare'),
+            Department(name='Dermatology', description='Skin, hair, and nails'),
+            Department(name='General Medicine', description='General health checkups'),
+        ]
+        db.session.add_all(departments)
+        db.session.commit()
+
+
 def init_db(app) -> None:
-    #Initialize the database: create tables and seed the Admin user.
+    """Initialize the database: create tables and seed data."""
     with app.app_context():
         db.create_all()
-        create_admin_user('admin', 'default_password')  # Change password in production
+        create_admin_user('admin@hospital.com', 'admin123')
+        seed_departments()

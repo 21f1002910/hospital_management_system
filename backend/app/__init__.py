@@ -12,14 +12,12 @@ def create_app():
     app.config.from_object('config.Config')
     db.init_app(app)
     jwt.init_app(app)
-    
-    from .models import init_db
-    with app.app_context():
-        init_db(app)  # Creates tables and admin on app start
-    
-    # Import routes here later, e.g., from .routes import api_bp; app.register_blueprint(api_bp)
-    from .routes import api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
 
+    from .routes import register_routes
+    register_routes(app)
+     
+    with app.app_context():
+        from .models import init_db
+        init_db(app) 
 
     return app

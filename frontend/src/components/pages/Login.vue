@@ -1,44 +1,36 @@
 <script setup>
-import { reactive, ref } from 'vue'
-import axios from 'axios'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useStorage } from '@vueuse/core' 
-import { useMessageStore } from '../../store/index.js'
+import { useAuthStore } from '../../store/auth.js'
+import { useMessageStore } from '../../store'
 
-const messageStore = useMessageStore()
 const router = useRouter()
-const form = reactive({ username: '', password: '' })
-const loggedIn = ref(false)
-const token = useStorage('token', '')
-const role = useStorage('role', '')
+const authStore = useAuthStore()
+const messageStore = useMessageStore()
 
+const form = ref({
+  email: '',
+  password: ''
+})
 
-const handleLogin = async () => {
-  messageStore.clear()
+const loading = ref(false)
+
+async function handleLogin() {
+  loading.value = true
+
   try {
-    const response = await axios.post('/api/login', form, {
-      validateStatus: status => status < 500
-    })
-    
-    if (response.status === 200) {
-      messageStore.showSuccess('Login successful!')
-      
-      token.value = response.data.access_token
-      role.value = response.data.role
-      
-      if (role.value === 'Admin') {
-        router.push({ name: 'AdminHome' })
-      } else if (role.value === 'Doctor') {
-        router.push({ name: 'DoctorHome' })
-      } else if (role.value === 'Patient') {
-        router.push({ name: 'PatientHome' })
-      }
+    const result = await authStore.login(form.value)
+
+    if (result.success) {
+      messageStore.success('Login successful!')
+      router.push(authStore.getDashboardRoute())
     } else {
-      messageStore.showError(response.data?.message || 'Login failed')
+      messageStore.error(result.message || 'Invalid credentials')
     }
   } catch (error) {
-    messageStore.showError(error.message || 'Network error')
-    console.error('Login error:', error)
+    messageStore.error('An error occurred. Please try again.')
+  } finally {
+    loading.value = false
   }
 }
 </script>
@@ -49,9 +41,9 @@ const handleLogin = async () => {
       <h3 class="text-center mb-4">Enter your credentials</h3>
       <form @submit.prevent="handleLogin">
         <div class="form-group row mb-3">
-          <label for="username" class="col-sm-4 col-form-label">Username</label>
+          <label for="email" class="col-sm-4 col-form-label">Email</label>
           <div class="col-sm-8">
-            <input type="text" class="form-control" v-model="form.username" placeholder="Enter username" required>
+            <input type="text" class="form-control" v-model="form.email" placeholder="Enter email" required>
           </div>
         </div>
         <div class="form-group row mb-4">

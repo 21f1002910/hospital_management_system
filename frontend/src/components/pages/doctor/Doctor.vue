@@ -8,11 +8,10 @@ import { useMessageStore } from '../../../store'
 const router = useRouter()
 const authStore = useAuthStore()
 const messageStore = useMessageStore()
-
 </script>
 
 <template>
-    <div>Welcome Admin!</div>
+    <div>Welcome Doctor!</div>
 </template>
 
 <style scoped>
