@@ -17,7 +17,7 @@ def register_routes(app):
             'version': '1.0',
             'endpoints': {
                 'auth': '/api/auth (login, register)',
-                'admin': '/api/admin (dashboard)',
+                'admin': '/api/admin (dashboard, appointments)',
                 'patient': '/api/patient (dashboard)',
                 'doctor': '/api/doctor (dashboard)'
             }

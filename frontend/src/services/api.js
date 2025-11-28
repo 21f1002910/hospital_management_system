@@ -44,4 +44,39 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data)
 }
 
+// ============= ADMIN ENDPOINTS (ADD TO YOUR EXISTING api.js) =============
+export const adminAPI = {
+  // Dashboard
+  getDashboard: () => api.get('/admin/dashboard'),
+  
+  // Patients
+  getPatients: (params) => api.get('/admin/patients', { params }),
+  getPatient: (id) => api.get(`/admin/patients/${id}`),
+  searchPatients: (search, page = 1) => api.get('/admin/patients', {
+    params: { search, page, per_page: 10 }
+  }),
+  
+  // Doctors
+  getDoctors: (params) => api.get('/admin/doctors', { params }),
+  getDoctor: (id) => api.get(`/admin/doctors/${id}`),
+  createDoctor: (data) => api.post('/admin/doctors', data),
+  updateDoctor: (id, data) => api.put(`/admin/doctors/${id}`, data),
+  deleteDoctor: (id) => api.delete(`/admin/doctors/${id}`),
+  searchDoctors: (search, specialization = '', page = 1) => api.get('/admin/doctors', {
+    params: { search, specialization, page, per_page: 10 }
+  }),
+  
+  // Appointments
+  getAppointments: (params) => api.get('/admin/appointments', { params }),
+  getAppointment: (id) => api.get(`/admin/appointments/${id}`),
+  updateAppointment: (id, data) => api.put(`/admin/appointments/${id}`, data),
+  filterAppointments: (filters) => api.get('/admin/appointments', { params: filters }),
+  
+  // Departments
+  getDepartments: () => api.get('/admin/departments'),
+  createDepartment: (data) => api.post('/admin/departments', data),
+  updateDepartment: (id, data) => api.put(`/admin/departments/${id}`, data),
+  deleteDepartment: (id) => api.delete(`/admin/departments/${id}`)
+}
+
 export default api

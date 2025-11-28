@@ -45,8 +45,11 @@ function handleLogout() {
       <slot />
     </main>
 
-    <footer class="app-footer">
-        <small>Created by</small>
+    <footer class="py-3 mt-5 text-center">
+      <span>Created by  </span>
+      <a href="https://github.com/21f1002910" target="_blank">
+        <img src="/src/assets/github_profile.jpg" class="rounded-circle" style="width:40px; height:40px; object-fit:cover;">
+      </a>
     </footer>
   </div>
 </template>

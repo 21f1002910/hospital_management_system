@@ -13,7 +13,7 @@ def role_required(*roles):
         @jwt_required()
         def decorator(*args, **kwargs):
             current_user_id = get_jwt_identity()
-            user = User.query.get(current_user_id)
+            user = User.query.get(int(current_user_id))
             if not user or user.role not in roles:
                 return jsonify({'message': 'Access forbidden: insufficient permissions'}), 403
             return fn(*args, **kwargs)

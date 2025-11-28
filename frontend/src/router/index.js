@@ -24,11 +24,37 @@ const routes = [
             requiresGuest: true}
   },
   {
-    path: '/admin/dashboard',
-    name: 'AdminHome',
-    component: () => import('@components/pages/admin/Admin.vue'),
-    meta: { title: `${app_name} - Admin Dashboard`,
-            requiresAuth: true, role: 'Admin'}
+    path: '/admin',
+    component: () => import('@components/pages/admin/Layout.vue'),
+    meta: { title: `${app_name} - Admin`,
+            requiresAuth: true, role: 'Admin'},
+    children: [
+      {
+        path: 'dashboard',
+        name: 'AdminDashboard',
+        component: () => import('@components/pages/admin/Dashboard.vue'),
+      },
+      {
+        path: 'patients',
+        name: 'AdminPatients',
+        component: () => import('@components/pages/admin/Patients.vue'),
+      },
+      {
+        path: 'doctors',
+        name: 'AdminDoctors',
+        component: () => import('@components/pages/admin/Doctors.vue'),
+      },
+      {
+        path: 'appointments',
+        name: 'AdminAppointments',
+        component: () => import('@components/pages/admin/Appointments.vue'),
+      },
+      {
+        path: 'departments',
+        name: 'AdminDepartments',
+        component: () => import('@components/pages/admin/Departments.vue'),
+      }
+    ]
   },
   {
     path: '/patient/dashboard',
