@@ -79,4 +79,35 @@ export const adminAPI = {
   deleteDepartment: (id) => api.delete(`/admin/departments/${id}`)
 }
 
+
+// ============= DOCTOR ENDPOINTS (ADD TO YOUR EXISTING api.js) =============
+export const doctorAPI = {
+  // Dashboard
+  getDashboard: () => api.get('/doctor/dashboard'),
+  
+  // Profile
+  getProfile: () => api.get('/doctor/profile'),
+  updateProfile: (data) => api.put('/doctor/profile', data),
+  
+  // Appointments
+  getAppointments: (params) => api.get('/doctor/appointments', { params }),
+  getAppointment: (id) => api.get(`/doctor/appointments/${id}`),
+  updateAppointment: (id, data) => api.put(`/doctor/appointments/${id}`, data),
+  
+  // Treatments
+  addTreatment: (appointmentId, data) => api.post(`/doctor/appointments/${appointmentId}/treatment`, data),
+  updateTreatment: (treatmentId, data) => api.put(`/doctor/treatments/${treatmentId}`, data),
+  
+  // Patients
+  getPatients: () => api.get('/doctor/patients'),
+  getPatientDetails: (id) => api.get(`/doctor/patients/${id}`),
+  
+  // Availability
+  getAvailability: () => api.get('/doctor/availability'),
+  addAvailability: (data) => api.post('/doctor/availability', data),
+  updateAvailability: (id, data) => api.put(`/doctor/availability/${id}`, data),
+  deleteAvailability: (id) => api.delete(`/doctor/availability/${id}`)
+}
+
+
 export default api

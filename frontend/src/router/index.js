@@ -57,18 +57,37 @@ const routes = [
     ]
   },
   {
-    path: '/patient/dashboard',
-    name: 'PatientHome',
-    component: () => import('@components/pages/patient/Patient.vue'),
-    meta: { title: `${app_name} - Patient Dashboard`,
-            requiresAuth: true, role: 'Patient'}
-  },
-  {
-    path: '/doctor/dashboard',
-    name: 'DoctorHome',
-    component: () => import('@components/pages/doctor/Doctor.vue'),
-    meta: { title: `${app_name} - Doctor Dashboard`,
-            requiresAuth: true, role: 'Doctor'}
+    path: '/doctor',
+    component: () => import('@components/pages/doctor/Layout.vue'),
+    meta: { title: `${app_name} - Doctor`,
+            requiresAuth: true, role: 'Doctor'},
+    children: [
+      {
+        path: 'dashboard',
+        name: 'DoctorDashboard',
+        component: () => import('@components/pages/doctor/Dashboard.vue'),
+      },
+      {
+        path: 'patients',
+        name: 'DoctorPatients',
+        component: () => import('@components/pages/doctor/Patients.vue'),
+      },
+      {
+        path: 'patients/:id',
+        name: 'DoctorPatientHistory',
+        component: () => import('@components/pages/doctor/PatientHistory.vue'),
+      },
+      {
+        path: 'appointments',
+        name: 'DoctorAppointments',
+        component: () => import('@components/pages/doctor/Appointments.vue'),
+      },
+      {
+        path: 'availability',
+        name: 'DoctorAvailability',
+        component: () => import('@components/pages/doctor/Availability.vue'),
+      }
+    ]
   }
 ]
 
