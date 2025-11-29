@@ -109,5 +109,33 @@ export const doctorAPI = {
   deleteAvailability: (id) => api.delete(`/doctor/availability/${id}`)
 }
 
+// ============= PATIENT ENDPOINTS (ADD TO YOUR EXISTING api.js) =============
+export const patientAPI = {
+  // Dashboard
+  getDashboard: () => api.get('/patient/dashboard'),
+  
+  // Profile
+  getProfile: () => api.get('/patient/profile'),
+  updateProfile: (data) => api.put('/patient/profile', data),
+  
+  // Doctors
+  getDoctors: (params) => api.get('/patient/doctors', { params }),
+  getDoctor: (id) => api.get(`/patient/doctors/${id}`),
+  getDepartments: () => api.get('/patient/departments'),
+  searchDoctors: (search, specialization = '', page = 1) => api.get('/patient/doctors', {
+    params: { search, specialization, page, per_page: 12 }
+  }),
+  
+  // Appointments
+  getAppointments: (params) => api.get('/patient/appointments', { params }),
+  getAppointment: (id) => api.get(`/patient/appointments/${id}`),
+  bookAppointment: (data) => api.post('/patient/appointments', data),
+  rescheduleAppointment: (id, data) => api.put(`/patient/appointments/${id}`, data),
+  cancelAppointment: (id) => api.delete(`/patient/appointments/${id}`),
+  
+  // Medical History
+  getMedicalHistory: () => api.get('/patient/medical-history')
+}
+
 
 export default api
