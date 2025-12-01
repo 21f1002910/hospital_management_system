@@ -8,6 +8,7 @@ def register_routes(app):
     from .admin import admin_bp
     from .patient import patient_bp
     from .doctor import doctor_bp
+    from .appointments import appointment_bp
     
     # Root endpoint
     @app.route('/')
@@ -19,7 +20,8 @@ def register_routes(app):
                 'auth': '/api/auth (login, register)',
                 'admin': '/api/admin (dashboard, appointments)',
                 'patient': '/api/patient (dashboard)',
-                'doctor': '/api/doctor (dashboard)'
+                'doctor': '/api/doctor (dashboard)',
+                'appointments': '/api/appointment'
             }
         }), 200
     
@@ -28,3 +30,4 @@ def register_routes(app):
     app.register_blueprint(admin_bp)
     app.register_blueprint(patient_bp)
     app.register_blueprint(doctor_bp)
+    app.register_blueprint(appointment_bp)

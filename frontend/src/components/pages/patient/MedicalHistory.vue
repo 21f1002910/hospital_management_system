@@ -57,13 +57,13 @@ onMounted(() => {
 
 
 <template>
-  <div>
+  <div class="mt-5 pt-3">
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h1 class="h3 fw-bold text-dark mb-0">Medical History</h1>
       <button
         v-if="history.length > 0"
         @click="window.print()"
-        class="btn btn-primary px-4 py-2 fw-medium"
+        class="btn btn-primary px-4 py-2 fw-semibold"
       >
         🖨️ Print History
       </button>
@@ -88,7 +88,7 @@ onMounted(() => {
       </p>
       <router-link
         to="/patient/doctors"
-        class="btn btn-primary px-4 py-2 fw-medium"
+        class="btn btn-primary px-4 py-2 fw-semibold"
       >
         Book an Appointment
       </router-link>
@@ -138,7 +138,7 @@ onMounted(() => {
                     Dr. {{ record.doctor_name }}
                   </h3>
                 </div>
-                <p class="text-primary fw-medium mb-1">
+                <p class="text-primary fw-semibold mb-1">
                   {{ record.specialization }}
                 </p>
                 <div class="d-flex flex-wrap align-items-center gap-3 small text-muted">
@@ -229,7 +229,7 @@ onMounted(() => {
                     <p class="small fw-semibold text-secondary text-uppercase mb-1">
                       Follow-up Visit
                     </p>
-                    <p class="mb-0 fw-medium text-dark">
+                    <p class="mb-0 fw-semibold text-dark">
                       {{ formatDate(record.treatment.next_visit_date) }}
                     </p>
                   </div>
@@ -250,12 +250,12 @@ onMounted(() => {
         <div class="d-flex flex-column flex-md-row gap-3">
           <button
             @click="window.print()"
-            class="btn btn-primary flex-fill px-4 py-2 fw-medium"
+            class="btn btn-primary flex-fill px-4 py-2 fw-semibold"
           >
             🖨️ Print Records
           </button>
           <button
-            class="btn btn-light flex-fill px-4 py-2 fw-medium"
+            class="btn btn-light flex-fill px-4 py-2 fw-semibold"
           >
             📧 Email to Doctor
           </button>

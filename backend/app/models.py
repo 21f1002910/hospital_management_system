@@ -72,7 +72,6 @@ class Doctor(db.Model):
     specialization_id = db.Column(db.Integer, db.ForeignKey('departments.id'), nullable=False)
     bio = db.Column(db.Text, nullable=True)
     contact = db.Column(db.String(50), nullable=True)
-    schedule = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

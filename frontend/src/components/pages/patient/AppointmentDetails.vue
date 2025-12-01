@@ -127,7 +127,7 @@ onMounted(() => {
               <div class="row">
                 <div class="col-12 col-md-6 mb-2">
                   <div class="small text-muted">Doctor Name</div>
-                  <div class="fw-medium">Dr. {{ appointment.doctor.name }}</div>
+                  <div class="fw-medium">{{ appointment.doctor.name }}</div>
                 </div>
 
                 <div class="col-12 col-md-6 mb-2">
